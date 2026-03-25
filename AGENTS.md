@@ -2,8 +2,8 @@
 
 ## Project intent
 
-This repository contains a Unity 2D prototype for **Farm Merger**:
-a cozy merge game with a farm fantasy theme.
+This repository contains a Unity 2D prototype for **Keep on mining**:
+a cozy incremental isometric game
 
 Primary goal:
 - quickly explore and validate the core merge loop
