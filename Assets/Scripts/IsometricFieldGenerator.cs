@@ -10,17 +10,28 @@ public class IsometricFieldGenerator : MonoBehaviour
     [SerializeField] private int tilePixelWidth = 64;
     [SerializeField] private int tilePixelHeight = 32;
     [SerializeField] private float pixelsPerUnit = 32f;
-    [SerializeField] private Color grassColor = new Color(0.25f, 0.7f, 0.25f, 1f);
+    [SerializeField] private Sprite tileSprite;
 
     [Header("Camera Fit")]
     [SerializeField] private bool fitCameraOnStart = true;
-    [SerializeField] private float cameraPadding = 0.5f;
-
-    private Sprite tileSprite;
+    [SerializeField] private float cameraPadding = 1.0f;
 
     private void Awake()
     {
-        tileSprite = CreateDiamondSprite(tilePixelWidth, tilePixelHeight, pixelsPerUnit, grassColor);
+        if (tileSprite == null)
+        {
+            Texture2D texture = Resources.Load<Texture2D>("Sprites/grass_iso");
+            if (texture != null)
+            {
+                texture.filterMode = FilterMode.Point;
+                texture.wrapMode = TextureWrapMode.Clamp;
+                tileSprite = Sprite.Create(
+                    texture,
+                    new Rect(0, 0, texture.width, texture.height),
+                    new Vector2(0.5f, 0.5f),
+                    pixelsPerUnit);
+            }
+        }
     }
 
     private void Start()
@@ -34,6 +45,11 @@ public class IsometricFieldGenerator : MonoBehaviour
 
     private void Generate()
     {
+        if (tileSprite == null)
+        {
+            return;
+        }
+
         float tileWorldWidth = tilePixelWidth / pixelsPerUnit;
         float tileWorldHeight = tilePixelHeight / pixelsPerUnit;
 
@@ -75,39 +91,5 @@ public class IsometricFieldGenerator : MonoBehaviour
 
         cam.orthographicSize = worldHeight * 0.5f + cameraPadding;
         cam.transform.position = new Vector3(0f, 0f, cam.transform.position.z);
-    }
-
-    private static Sprite CreateDiamondSprite(int pixelWidth, int pixelHeight, float ppu, Color fillColor)
-    {
-        if (pixelWidth <= 0 || pixelHeight <= 0 || ppu <= 0f)
-        {
-            return null;
-        }
-
-        Texture2D texture = new Texture2D(pixelWidth, pixelHeight, TextureFormat.ARGB32, false);
-        texture.filterMode = FilterMode.Point;
-        texture.wrapMode = TextureWrapMode.Clamp;
-
-        int cx = pixelWidth / 2;
-        int cy = pixelHeight / 2;
-        float halfWidth = pixelWidth / 2f;
-        float halfHeight = pixelHeight / 2f;
-
-        for (int y = 0; y < pixelHeight; y++)
-        {
-            for (int x = 0; x < pixelWidth; x++)
-            {
-                float dx = Mathf.Abs(x + 0.5f - cx) / halfWidth;
-                float dy = Mathf.Abs(y + 0.5f - cy) / halfHeight;
-                bool inside = dx + dy <= 1f;
-                texture.SetPixel(x, y, inside ? fillColor : Color.clear);
-            }
-        }
-
-        texture.Apply();
-
-        Rect rect = new Rect(0, 0, pixelWidth, pixelHeight);
-        Vector2 pivot = new Vector2(0.5f, 0.5f);
-        return Sprite.Create(texture, rect, pivot, ppu);
     }
 }

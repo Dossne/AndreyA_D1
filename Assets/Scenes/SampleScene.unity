@@ -256,4 +256,4 @@ MonoBehaviour:
   pixelsPerUnit: 32
   grassColor: {r: 0.25, g: 0.7, b: 0.25, a: 1}
   fitCameraOnStart: 1
-  cameraPadding: 0.5
+  cameraPadding: 1
