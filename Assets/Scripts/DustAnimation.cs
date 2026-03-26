@@ -6,6 +6,7 @@ public class DustAnimation : MonoBehaviour
     private const int SheetColumns = 6;
     private const int SheetRows = 6;
     private const float FrameRate = 72f;
+    private const float FrameCount = 32;
     private const float PixelsPerUnit = 32f;
     private const int SortingOrder = 2000;
 
@@ -42,13 +43,18 @@ public class DustAnimation : MonoBehaviour
 
         timer += Time.deltaTime;
         int frameIndex = Mathf.FloorToInt(timer * FrameRate);
-        if (frameIndex >= frames.Count)
+        if (frameIndex >= FrameCount)
         {
             Destroy(gameObject);
             return;
         }
 
+        float alpha = 1.0f - frameIndex / FrameCount;
+
         spriteRenderer.sprite = frames[frameIndex];
+        Color c = spriteRenderer.color;
+        c.a = alpha;
+        spriteRenderer.color = c;
     }
 
     private void LoadFrames()
