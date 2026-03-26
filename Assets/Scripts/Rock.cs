@@ -64,6 +64,7 @@ public class Rock : MonoBehaviour
 
         if (durability <= 0f)
         {
+            SpawnDust();
             Destroy(gameObject);
         }
     }
@@ -94,5 +95,12 @@ public class Rock : MonoBehaviour
         {
             spriteRenderer.sprite = sprite;
         }
+    }
+
+    private void SpawnDust()
+    {
+        GameObject dust = new GameObject("RockDust");
+        dust.transform.position = transform.position;
+        dust.AddComponent<DustAnimation>();
     }
 }
