@@ -43,6 +43,12 @@ public class CoinCounter : MonoBehaviour
         UpdateText();
     }
 
+    public void ResetCoins()
+    {
+        coins = StartingCoins;
+        UpdateText();
+    }
+
     private void UpdateText()
     {
         if (text != null)

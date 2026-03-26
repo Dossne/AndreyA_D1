@@ -95,11 +95,43 @@ public class IsometricFieldGenerator : MonoBehaviour
 
     private void Start()
     {
-        GenerateTiles();
-        SpawnRocks();
+        ResetLevel();
         if (fitCameraOnStart)
         {
             FitCamera();
+        }
+    }
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            ResetLevel();
+            if (fitCameraOnStart)
+            {
+                FitCamera();
+            }
+        }
+    }
+
+    private void ResetLevel()
+    {
+        ClearChildren();
+        GenerateTiles();
+        SpawnRocks();
+
+        CoinCounter counter = CoinCounter.Instance;
+        if (counter != null)
+        {
+            counter.ResetCoins();
+        }
+    }
+
+    private void ClearChildren()
+    {
+        for (int i = transform.childCount - 1; i >= 0; i--)
+        {
+            Destroy(transform.GetChild(i).gameObject);
         }
     }
 
