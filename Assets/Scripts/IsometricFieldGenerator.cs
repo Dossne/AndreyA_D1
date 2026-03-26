@@ -10,6 +10,7 @@ public class IsometricFieldGenerator : MonoBehaviour
     private const int RockSheetColumns = 3;
     private const int RockSheetRows = 2;
     private const float RockDurability = 3f;
+    private const int RockSortingOffset = 1000;
 
     [Header("Grid Size")]
     [SerializeField] private int width = 15;
@@ -203,7 +204,7 @@ public class IsometricFieldGenerator : MonoBehaviour
 
             SpriteRenderer renderer = rock.AddComponent<SpriteRenderer>();
             renderer.sprite = spawnInfo.Sprite;
-            renderer.sortingOrder = tile.SortingOrder + 1;
+            renderer.sortingOrder = RockSortingOffset + tile.SortingOrder;
 
             Rock rockComponent = rock.AddComponent<Rock>();
             rockComponent.Initialize(
