@@ -12,6 +12,10 @@ public class Rock : MonoBehaviour
     private const float DamagePerSecond = 4f;
     private const float CrackedThreshold = 1.5f;
 
+    private const int CoinsPlain = 1;
+    private const int CoinsDot = 2;
+    private const int CoinsGold = 5;
+
     [SerializeField] private float durability = 3f;
 
     private SpriteRenderer spriteRenderer;
@@ -64,8 +68,31 @@ public class Rock : MonoBehaviour
 
         if (durability <= 0f)
         {
+            AwardCoins();
             SpawnDust();
             Destroy(gameObject);
+        }
+    }
+
+    private void AwardCoins()
+    {
+        CoinCounter counter = CoinCounter.Instance;
+        if (counter == null)
+        {
+            return;
+        }
+
+        switch (rockType)
+        {
+            case RockType.Dot:
+                counter.AddCoins(CoinsDot);
+                break;
+            case RockType.Gold:
+                counter.AddCoins(CoinsGold);
+                break;
+            default:
+                counter.AddCoins(CoinsPlain);
+                break;
         }
     }
 
