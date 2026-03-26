@@ -11,13 +11,25 @@ public class CursorFollower : MonoBehaviour
 
     private static readonly Color CursorColor = new Color(0.85f, 0.85f, 0.85f, 0.5f);
 
+    public static CursorFollower Instance { get; private set; }
+    public static float RadiusWorld => CursorRadius;
+
     private SpriteRenderer spriteRenderer;
 
     private void Awake()
     {
+        Instance = this;
         spriteRenderer = gameObject.AddComponent<SpriteRenderer>();
         spriteRenderer.sprite = CreateCircleSprite(CursorRadius, CursorPixelsPerUnit, CursorColor);
         spriteRenderer.sortingOrder = CursorSortingOrder;
+    }
+
+    private void OnDestroy()
+    {
+        if (Instance == this)
+        {
+            Instance = null;
+        }
     }
 
     private void Update()

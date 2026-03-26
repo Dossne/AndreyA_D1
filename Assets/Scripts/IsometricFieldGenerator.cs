@@ -9,6 +9,7 @@ public class IsometricFieldGenerator : MonoBehaviour
 
     private const int RockSheetColumns = 3;
     private const int RockSheetRows = 2;
+    private const float RockDurability = 3f;
 
     [Header("Grid Size")]
     [SerializeField] private int width = 15;
@@ -34,6 +35,10 @@ public class IsometricFieldGenerator : MonoBehaviour
     private readonly List<Sprite> rockSimpleVariants = new List<Sprite>();
     private readonly List<Sprite> rockGoldDotsVariants = new List<Sprite>();
     private readonly List<Sprite> rockGoldVariants = new List<Sprite>();
+
+    private readonly List<Sprite> rockSimpleCrackedVariants = new List<Sprite>();
+    private readonly List<Sprite> rockGoldDotsCrackedVariants = new List<Sprite>();
+    private readonly List<Sprite> rockGoldCrackedVariants = new List<Sprite>();
 
     private struct TileInfo
     {
@@ -62,6 +67,15 @@ public class IsometricFieldGenerator : MonoBehaviour
 
         rockGoldVariants.Clear();
         rockGoldVariants.AddRange(LoadSpriteSheetFromResources("Sprites/rocks_shadow_gold", RockSheetColumns, RockSheetRows));
+
+        rockSimpleCrackedVariants.Clear();
+        rockSimpleCrackedVariants.AddRange(LoadSpriteSheetFromResources("Sprites/rocks_shadow_cracked", RockSheetColumns, RockSheetRows));
+
+        rockGoldDotsCrackedVariants.Clear();
+        rockGoldDotsCrackedVariants.AddRange(LoadSpriteSheetFromResources("Sprites/rocks_shadow_gold_dots_cracked", RockSheetColumns, RockSheetRows));
+
+        rockGoldCrackedVariants.Clear();
+        rockGoldCrackedVariants.AddRange(LoadSpriteSheetFromResources("Sprites/rocks_shadow_gold_cracked", RockSheetColumns, RockSheetRows));
 
         if (rockSpriteSimple == null)
         {
@@ -144,8 +158,8 @@ public class IsometricFieldGenerator : MonoBehaviour
         for (int i = 0; i < spawnCount; i++)
         {
             TileInfo tile = tiles[i];
-            Sprite rockSprite = PickWeightedRockSprite();
-            if (rockSprite == null)
+            RockSpawnInfo spawnInfo = PickWeightedRockSpawn();
+            if (spawnInfo.Sprite == null)
             {
                 continue;
             }
@@ -156,50 +170,77 @@ public class IsometricFieldGenerator : MonoBehaviour
             rock.transform.localScale = RockScaleVector;
 
             SpriteRenderer renderer = rock.AddComponent<SpriteRenderer>();
-            renderer.sprite = rockSprite;
+            renderer.sprite = spawnInfo.Sprite;
             renderer.sortingOrder = tile.SortingOrder + 1;
+
+            Rock rockComponent = rock.AddComponent<Rock>();
+            rockComponent.Initialize(
+                spawnInfo.Type,
+                spawnInfo.SpriteIndex,
+                spawnInfo.NormalVariants,
+                spawnInfo.CrackedVariants,
+                RockDurability);
         }
     }
 
-    private Sprite PickWeightedRockSprite()
+    private RockSpawnInfo PickWeightedRockSpawn()
     {
         int roll = Random.Range(0, 100);
         if (roll < 70)
         {
-            return PickSimpleRockVariant();
+            return PickSimpleRockSpawn();
         }
         if (roll < 90)
         {
-            return PickGoldDotsVariant();
+            return PickGoldDotsRockSpawn();
         }
-        return PickGoldVariant();
+        return PickGoldRockSpawn();
     }
 
-    private Sprite PickSimpleRockVariant()
+    private RockSpawnInfo PickSimpleRockSpawn()
     {
-        if (rockSimpleVariants.Count > 0)
-        {
-            return rockSimpleVariants[Random.Range(0, rockSimpleVariants.Count)];
-        }
-        return rockSpriteSimple;
+        int index = PickVariantIndex(rockSimpleVariants.Count);
+        Sprite sprite = PickSpriteFromVariants(rockSimpleVariants, rockSpriteSimple, index);
+        Sprite[] normal = rockSimpleVariants.ToArray();
+        Sprite[] cracked = rockSimpleCrackedVariants.ToArray();
+        return new RockSpawnInfo(Rock.RockType.Plain, index, sprite, normal, cracked);
     }
 
-    private Sprite PickGoldDotsVariant()
+    private RockSpawnInfo PickGoldDotsRockSpawn()
     {
-        if (rockGoldDotsVariants.Count > 0)
-        {
-            return rockGoldDotsVariants[Random.Range(0, rockGoldDotsVariants.Count)];
-        }
-        return rockSpriteGoldDots;
+        int index = PickVariantIndex(rockGoldDotsVariants.Count);
+        Sprite sprite = PickSpriteFromVariants(rockGoldDotsVariants, rockSpriteGoldDots, index);
+        Sprite[] normal = rockGoldDotsVariants.ToArray();
+        Sprite[] cracked = rockGoldDotsCrackedVariants.ToArray();
+        return new RockSpawnInfo(Rock.RockType.Dot, index, sprite, normal, cracked);
     }
 
-    private Sprite PickGoldVariant()
+    private RockSpawnInfo PickGoldRockSpawn()
     {
-        if (rockGoldVariants.Count > 0)
+        int index = PickVariantIndex(rockGoldVariants.Count);
+        Sprite sprite = PickSpriteFromVariants(rockGoldVariants, rockSpriteGold, index);
+        Sprite[] normal = rockGoldVariants.ToArray();
+        Sprite[] cracked = rockGoldCrackedVariants.ToArray();
+        return new RockSpawnInfo(Rock.RockType.Gold, index, sprite, normal, cracked);
+    }
+
+    private int PickVariantIndex(int count)
+    {
+        if (count <= 0)
         {
-            return rockGoldVariants[Random.Range(0, rockGoldVariants.Count)];
+            return 0;
         }
-        return rockSpriteGold;
+        return Random.Range(0, count);
+    }
+
+    private Sprite PickSpriteFromVariants(List<Sprite> variants, Sprite fallback, int index)
+    {
+        if (variants.Count > 0)
+        {
+            int safeIndex = Mathf.Clamp(index, 0, variants.Count - 1);
+            return variants[safeIndex];
+        }
+        return fallback;
     }
 
     private void ShuffleTiles()
@@ -274,5 +315,23 @@ public class IsometricFieldGenerator : MonoBehaviour
         }
 
         return sprites;
+    }
+
+    private readonly struct RockSpawnInfo
+    {
+        public readonly Rock.RockType Type;
+        public readonly int SpriteIndex;
+        public readonly Sprite Sprite;
+        public readonly Sprite[] NormalVariants;
+        public readonly Sprite[] CrackedVariants;
+
+        public RockSpawnInfo(Rock.RockType type, int spriteIndex, Sprite sprite, Sprite[] normalVariants, Sprite[] crackedVariants)
+        {
+            Type = type;
+            SpriteIndex = spriteIndex;
+            Sprite = sprite;
+            NormalVariants = normalVariants;
+            CrackedVariants = crackedVariants;
+        }
     }
 }
