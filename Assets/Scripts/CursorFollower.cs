@@ -4,7 +4,7 @@ public class CursorFollower : MonoBehaviour
 {
     private const float CursorRadius = 0.4f;
     private const int CursorPixelsPerUnit = 64;
-    private const int CursorSortingOrder = 1000;
+    private const int CursorSortingOrder = 1100;
 
     private const float CursorPressedScale = 1.2f;
     private const float CursorScaleSpeed = 10f;

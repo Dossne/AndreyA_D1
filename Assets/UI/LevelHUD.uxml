@@ -1,0 +1,8 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <ui:VisualElement style="flex-grow: 1; background-color: rgba(176, 105, 105, 0); width: auto; height: auto; justify-content: flex-start; align-self: stretch; flex-basis: auto; opacity: 1; flex-direction: row;">
+        <ui:VisualElement name="gold_panel" style="flex-grow: 0; background-color: rgba(56, 56, 56, 0); width: 500px; height: 50px; rotate: 0; align-self: stretch; flex-direction: row; align-items: flex-start; justify-content: space-between; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; margin-top: 0; margin-left: 0; display: flex;">
+            <ui:VisualElement name="icon" style="flex-grow: 0; width: 32px; height: 32px; background-image: resource(&apos;Sprites/gold_ore&apos;); align-self: center; align-items: center; justify-content: space-between; flex-direction: row; background-color: rgb(101, 0, 0); margin-top: 0;" />
+            <ui:Label tabindex="-1" text="Label" parse-escape-sequences="true" display-tooltip-when-elided="true" name="coin_counter" style="white-space: nowrap; align-self: flex-start; align-items: flex-start; flex-grow: 1; -unity-font: url(&quot;project://database/Assets/UI%20Toolkit/UnityThemes/UnityDefaultRuntimeTheme.tss?fileID=2230732570650464555&amp;guid=5a441a1a9fac0e8498d791a2f7541ba9&amp;type=3#NotInter-Regular&quot;); color: rgb(255, 255, 255); font-size: 24px; -unity-text-align: middle-left;" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>
